@@ -32,7 +32,6 @@ class AutoShift : public kaleidoscope::Plugin {
     static void set_delay(uint16_t new_delay);
     static uint8_t delay();
 
-    // Event handlers. Delete what you don't need.
     EventHandlerResult onKeyswitchEvent(Key &mapped_key, byte row, byte col,
                                         uint8_t key_state);
   

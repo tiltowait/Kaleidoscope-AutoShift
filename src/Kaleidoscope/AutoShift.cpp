@@ -105,7 +105,11 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
 
     // We passed the time window, so shift the key.
     if(delta > delay_) {
-      hid::pressKey(LSHIFT(mapped_key));
+      // We aren't using LSHIFT(mapped_key) because that gives us a conversion
+      // warning.
+      Key shifted_key = mapped_key;
+      shifted_key.flags |= SHIFT_HELD;
+      hid::pressKey(shifted_key);
       start_time_ = 0;  // Reset the timer.
       return EventHandlerResult::OK;
     }
