@@ -70,6 +70,7 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
   // learn how annoying it is not to have that functionality.
   if(disabled_
      || mapped_key == Key_Backspace
+     || mapped_key.flags & SYNTHETIC  // Fix ShiftToLayer issue.
      || isKeyModifier(mapped_key)) {
     return EventHandlerResult::OK;
   }
