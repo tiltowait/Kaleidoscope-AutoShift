@@ -40,9 +40,10 @@ class AutoShift : public kaleidoscope::Plugin {
     static uint16_t delay_;
     static uint32_t start_time_;
 
-    static bool isKeyModifier(Key key);
-
     static inline uint32_t computeTimeDelta(uint32_t start);
+
+    static inline bool isKeyModifier(Key key);
+    static inline bool isKeyIgnored(Key key);
 
     static inline bool isKeyShift(Key key) {
       return (key == Key_LeftShift

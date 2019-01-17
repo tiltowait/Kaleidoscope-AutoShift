@@ -68,10 +68,7 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
   // Since modifiers are held by design, we don't enforce any special rules on
   // them. Also, allow backspace to be spammed, because dear God did I just
   // learn how annoying it is not to have that functionality.
-  if(disabled_
-     || mapped_key == Key_Backspace
-     || mapped_key.flags & SYNTHETIC  // Fix ShiftToLayer issue.
-     || isKeyModifier(mapped_key)) {
+  if(disabled_ || isKeyIgnored(mapped_key)) {
     return EventHandlerResult::OK;
   }
 
@@ -125,6 +122,7 @@ uint32_t AutoShift::computeTimeDelta(uint32_t start) {
   uint32_t current_time = Kaleidoscope.millisAtCycleStart();
   return current_time - start;
 }
+
 // Returns true if key is control, alt, shift, or gui.
 bool AutoShift::isKeyModifier(Key key) {
   // If it's not a keyboard key, return false
@@ -132,6 +130,21 @@ bool AutoShift::isKeyModifier(Key key) {
 
   return (key.keyCode >= HID_KEYBOARD_FIRST_MODIFIER &&
           key.keyCode <= HID_KEYBOARD_LAST_MODIFIER);
+}
+
+// Certain keys are unaffected by shift and should be ignored by the plugin.
+// This has the benefit of allowing them to repeat, which is nice fof backspace,
+// arrow keys, etc.
+bool AutoShift::isKeyIgnored(Key key) {
+  return key == Key_Backspace
+         || key.flags & SYNTHETIC  // Fix ShiftToLayer issue
+         || key == Key_LeftArrow
+         || key == Key_RightArrow
+         || key == Key_UpArrow
+         || key == Key_DownArrow
+         || key == Key_PageUp
+         || key == Key_PageDown
+         || isKeyModifier(key);
 }
 
 // Legacy V1 API.
