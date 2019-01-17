@@ -144,6 +144,8 @@ bool AutoShift::isKeyIgnored(Key key) {
          || key == Key_DownArrow
          || key == Key_PageUp
          || key == Key_PageDown
+         || key == Key_NoKey
+         || key == Key_skip
          || isKeyModifier(key);
 }
 
