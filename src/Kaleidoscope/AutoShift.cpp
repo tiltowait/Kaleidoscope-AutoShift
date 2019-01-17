@@ -59,10 +59,9 @@ uint8_t AutoShift::delay() {
 
 // Event handlers.
 
-// When a key is toggled on, start a timer. If the key remains held longer than
-// delay_, send a shifted version of that key and halt keyswitch events until
-// the key is released. If the key is released within the time window, send
-// that key as-is.
+// When a key is toggled on, send it and start a timer. If the key remains held
+// longer than delay_, delete it, send a shifted version of that key, and halt
+// keyswitch events until the key is released.
 EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
                                               byte col, uint8_t key_state) {
   // Since modifiers are held by design, we don't enforce any special rules on
@@ -75,30 +74,17 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
     return EventHandlerResult::OK;
   }
 
-  // Start the timer when the user depresses a key.
+  // When the user presses a key, send that key and start the timer.
   if(keyToggledOn(key_state) && mapped_key.flags ^ SHIFT_HELD) {
     start_time_ = Kaleidoscope.millisAtCycleStart();
-    return EventHandlerResult::EVENT_CONSUMED;  // We only send OK on release
-  }
-
-  // When the user releases a key, send that key if it's within the time period.
-  if(keyToggledOff(key_state)) {
-    // Determine how long the key's been held.
-    uint32_t delta = computeTimeDelta(start_time_);
-    start_time_   = 0;  // Reset the timer.
-
-    // If we're within the delay period, send the key as-is.
-    if(delta <= delay_) {
-      hid::pressKey(mapped_key);
-      return EventHandlerResult::OK;
-    }
-  }
-  
-  // Allow the key to go through if it's shifted.
-  else if(key_state & SHIFT_HELD) {
     return EventHandlerResult::OK;
   }
 
+  // User accepted whatever key was output, so reset the timer.
+  if(keyToggledOff(key_state)) {
+    start_time_ = 0;
+  }
+  
   // If it's being held, check if it's time to shift it.
   if(keyWasPressed(key_state) && start_time_ != 0) {
     // Determine how long the key's been held.
@@ -106,6 +92,9 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
 
     // We passed the time window, so shift the key.
     if(delta > delay_) {
+      // First, delete the lowercase keystroke already issued.
+      hid::pressKey(Key_Backspace);
+
       // We aren't using LSHIFT(mapped_key) because that gives us a conversion
       // warning.
       Key shifted_key = mapped_key;
@@ -116,8 +105,8 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
     }
   }
 
-  // We haven't passed the delay period, and a key hasn't been released, so
-  // don't do anything.
+  // We need to disable key repeat or we'll wind up with tons of lowercase
+  // letters, followed by tons of uppercase ones.
   return EventHandlerResult::EVENT_CONSUMED;
 }
 
