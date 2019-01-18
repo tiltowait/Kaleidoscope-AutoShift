@@ -149,20 +149,6 @@ bool AutoShift::isKeyIgnored(Key key) {
          || isKeyModifier(key);
 }
 
-// Legacy V1 API.
-#if KALEIDOSCOPE_ENABLE_V1_PLUGIN_API
-void AutoShift::begin() {
-  Kaleidoscope.useEventHandlerHook(legacyEventHandler);
-}
-
-Key AutoShift::legacyEventHandler(Key mapped_key, byte row, byte col, uint8_t keyState) {
-  EventHandlerResult r = ::AutoShift.onKeyswitchEvent(mapped_key, row, col, keyState);
-  if (r == EventHandlerResult::OK)
-    return mapped_key;
-  return Key_NoKey;
-}
-#endif
-
 }  // namespace plugin
 }  // namespace kaleidoscope
 

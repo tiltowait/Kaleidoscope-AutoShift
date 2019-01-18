@@ -54,13 +54,6 @@ class AutoShift : public kaleidoscope::Plugin {
       return (hid::wasModifierKeyActive(Key_LeftShift)
               || hid::wasModifierKeyActive(Key_RightShift));
     }
-
-// Legacy V1 API.
-#if KALEIDOSCOPE_ENABLE_V1_PLUGIN_API
- protected:
-  void begin();
-  static Key legacyEventHandler(Key mapped_key, byte row, byte col, uint8_t keyState);
-#endif
 };
 
 
