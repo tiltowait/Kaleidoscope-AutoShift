@@ -162,8 +162,8 @@ bool AutoShift::isKeyIgnored(Key key) {
          || (key.keyCode >= FIRST_IGNORED_KEY
              && key.keyCode <= LAST_IGNORED_KEY)
          || key.flags & SYNTHETIC
-         || key == Key_NoKey  // This and skip probably don't matter whatsoever.
-         || key == Key_skip;
+         || key == Key_Transparent
+         || key == Key_NoKey;
 }
 
 }  // namespace plugin
