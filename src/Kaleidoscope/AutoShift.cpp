@@ -123,30 +123,47 @@ uint32_t AutoShift::computeTimeDelta(uint32_t start) {
   return current_time - start;
 }
 
-// Returns true if key is control, alt, shift, or gui.
-bool AutoShift::isKeyModifier(Key key) {
-  // If it's not a keyboard key, return false
-  if(key.flags & (SYNTHETIC | RESERVED)) return false;
-
-  return (key.keyCode >= HID_KEYBOARD_FIRST_MODIFIER &&
-          key.keyCode <= HID_KEYBOARD_LAST_MODIFIER);
-}
-
 // Certain keys are unaffected by shift and should be ignored by the plugin.
 // This has the benefit of allowing them to repeat, which is nice fof backspace,
 // arrow keys, etc.
+//
+// Luckily, the keycodes are almost all sequential, so we can do a simple
+// comparison:
+//   Home:   0x4A
+//   PgUp:   0x4B
+//   Delete: 0x4C
+//   End:    0x4D
+//   PgDn:   0x4E
+//   Right:  0x4F
+//   Left:   0x50
+//   Down:   0x51
+//   Up:     0x52
+//
+
+#define FIRST_IGNORED_KEY 0x4A
+#define LAST_IGNORED_KEY  0x52
+
+// Doing it this way allows us to potentially save a few comparisons. I've
+// tried to arrange them by decreasing prevalence so as to reduce the average
+// number of lookups.
+
+// In addition to the above, we have to ignore modifiers, which already have a
+// defined range: HID_KEYBOARD_FIRST_MODIFIER and HID_KEYBOARD_LAST_MODIFIER.
+//
+// Finally, we have some one-offs:
+//   Key_Backspace
+//   Key_NoKey
+//   Key_skip
+// key.flags & SYNTHETIC
 bool AutoShift::isKeyIgnored(Key key) {
   return key == Key_Backspace
-         || key.flags & SYNTHETIC  // Fix ShiftToLayer issue
-         || key == Key_LeftArrow
-         || key == Key_RightArrow
-         || key == Key_UpArrow
-         || key == Key_DownArrow
-         || key == Key_PageUp
-         || key == Key_PageDown
-         || key == Key_NoKey
-         || key == Key_skip
-         || isKeyModifier(key);
+         || (key.keyCode >= HID_KEYBOARD_FIRST_MODIFIER
+             && key.keyCode <= HID_KEYBOARD_LAST_MODIFIER)
+         || (key.keyCode >= FIRST_IGNORED_KEY
+             && key.keyCode <= LAST_IGNORED_KEY)
+         || key.flags & SYNTHETIC
+         || key == Key_NoKey  // This and skip probably don't matter whatsoever.
+         || key == Key_skip;
 }
 
 // Legacy V1 API.

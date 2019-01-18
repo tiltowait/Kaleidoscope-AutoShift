@@ -41,19 +41,7 @@ class AutoShift : public kaleidoscope::Plugin {
     static uint32_t start_time_;
 
     static inline uint32_t computeTimeDelta(uint32_t start);
-
-    static inline bool isKeyModifier(Key key);
     static inline bool isKeyIgnored(Key key);
-
-    static inline bool isKeyShift(Key key) {
-      return (key == Key_LeftShift
-              || key == Key_RightShift);
-    }
-
-    static inline bool isShiftKeyActive() {
-      return (hid::wasModifierKeyActive(Key_LeftShift)
-              || hid::wasModifierKeyActive(Key_RightShift));
-    }
 
 // Legacy V1 API.
 #if KALEIDOSCOPE_ENABLE_V1_PLUGIN_API
