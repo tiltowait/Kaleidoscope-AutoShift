@@ -86,15 +86,10 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
   if(keyWasPressed(key_state) && start_time_ != 0) {
     // We passed the time window, so shift the key.
     if(Kaleidoscope.hasTimeExpired(start_time_, delay_)) {
-      // First, delete the lowercase keystroke already issued.
       hid::pressKey(Key_Backspace);
+      hid::pressKey(LSHIFT(mapped_key));
+      start_time_ = 0;  // Reset the timer, or this will effectively loop
 
-      // We aren't using LSHIFT(mapped_key) because that gives us a conversion
-      // warning.
-      Key shifted_key = mapped_key;
-      shifted_key.flags |= SHIFT_HELD;
-      hid::pressKey(shifted_key);
-      start_time_ = 0;  // Reset the timer.
       return EventHandlerResult::OK;
     }
   }
@@ -105,7 +100,7 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
 }
 
 // Certain keys are unaffected by shift and should be ignored by the plugin.
-// This has the benefit of allowing them to repeat, which is nice fof backspace,
+// This has the benefit of allowing them to repeat, which is nice for backspace,
 // arrow keys, etc.
 //
 // Luckily, the keycodes are almost all sequential, so we can do a simple
