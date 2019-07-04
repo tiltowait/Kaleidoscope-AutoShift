@@ -1,6 +1,6 @@
 // -*- mode: c++ -*-
 // Kaleidoscope-AutoShift - Shift a key if it's been held for some time.
-// Copyright (C) 2019 Jared Lindsay 
+// Copyright (C) 2019 Jared Lindsay
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -34,13 +34,15 @@ class AutoShift : public kaleidoscope::Plugin {
 
     EventHandlerResult onKeyswitchEvent(Key &mapped_key, byte row, byte col,
                                         uint8_t key_state);
-  
+
   private:
     static bool disabled_;
     static uint16_t delay_;
     static uint32_t start_time_;
 
-    static inline uint32_t computeTimeDelta(uint32_t start);
+    static inline uint32_t computeTimeDelta(uint32_t start) {
+        return Kaleidoscope.millisAtCycleStart() - start_time_;
+    }
     static inline bool isKeyIgnored(Key key);
 };
 

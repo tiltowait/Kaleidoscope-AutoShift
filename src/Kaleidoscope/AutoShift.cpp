@@ -26,8 +26,8 @@ namespace plugin {
 bool AutoShift::disabled_ = false;  // Keeps track of plugin's active state
 
 // Time-related variables.
-uint16_t AutoShift::delay_        = 500;  // The timeout, in ms.
-uint32_t AutoShift::start_time_   = 0;    // Start time registered for each
+uint16_t AutoShift::delay_      = 500;  // The timeout, in ms.
+uint32_t AutoShift::start_time_ = 0;    // Start time registered for each
                                           // keystroke.
 
 // Basic plugin status functions.
@@ -81,7 +81,7 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
   if(keyToggledOff(key_state)) {
     start_time_ = 0;
   }
-  
+
   // If it's being held, check if it's time to shift it.
   if(keyWasPressed(key_state) && start_time_ != 0) {
     // Determine how long the key's been held.
@@ -105,11 +105,6 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
   // We need to disable key repeat or we'll wind up with tons of lowercase
   // letters, followed by tons of uppercase ones.
   return EventHandlerResult::EVENT_CONSUMED;
-}
-
-uint32_t AutoShift::computeTimeDelta(uint32_t start) {
-  uint32_t current_time = Kaleidoscope.millisAtCycleStart();
-  return current_time - start;
 }
 
 // Certain keys are unaffected by shift and should be ignored by the plugin.
