@@ -40,9 +40,6 @@ class AutoShift : public kaleidoscope::Plugin {
     static uint16_t delay_;
     static uint32_t start_time_;
 
-    static inline uint32_t computeTimeDelta(uint32_t start) {
-        return Kaleidoscope.millisAtCycleStart() - start_time_;
-    }
     static inline bool isKeyIgnored(Key key);
 };
 

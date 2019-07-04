@@ -28,7 +28,7 @@ bool AutoShift::disabled_ = false;  // Keeps track of plugin's active state
 // Time-related variables.
 uint16_t AutoShift::delay_      = 500;  // The timeout, in ms.
 uint32_t AutoShift::start_time_ = 0;    // Start time registered for each
-                                          // keystroke.
+                                        // keystroke.
 
 // Basic plugin status functions.
 
@@ -84,11 +84,8 @@ EventHandlerResult AutoShift::onKeyswitchEvent(Key &mapped_key, byte row,
 
   // If it's being held, check if it's time to shift it.
   if(keyWasPressed(key_state) && start_time_ != 0) {
-    // Determine how long the key's been held.
-    uint32_t delta = computeTimeDelta(start_time_);
-
     // We passed the time window, so shift the key.
-    if(delta > delay_) {
+    if(Kaleidoscope.hasTimeExpired(start_time_, delay_)) {
       // First, delete the lowercase keystroke already issued.
       hid::pressKey(Key_Backspace);
 
